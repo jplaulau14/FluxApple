@@ -8,14 +8,36 @@
 import SwiftUI
 
 struct ContentView: View {
+    
+    let sampleTasks = [
+        Task(title: "Buy groceries"),
+        Task(title: "Walk the dog", isCompleted: true),
+        Task(title: "Go for a walk")
+    ]
+    
     var body: some View {
-        VStack {
-            Text("Flux")
-                .font(.title)
-                .padding()
+        NavigationStack {
+            List {
+                ForEach(sampleTasks) { task in
+                    TaskRowView(task: task)
+                }
+            }
+            .navigationTitle("Flux")
+        }
+    }
+}
+
+struct TaskRowView: View {
+    let task: Task
+    
+    var body: some View {
+        HStack {
+            Image(systemName: task.isCompleted ? "checkmark.circle.fill": "circle")
+                .foregroundStyle(task.isCompleted ? .green: .gray)
             
-            Text("No tasks yet")
-                .foregroundStyle(.secondary)
+            Text(task.title)
+                .strikethrough(task.isCompleted)
+                .foregroundStyle(task.isCompleted ? .secondary: .primary)
         }
     }
 }
