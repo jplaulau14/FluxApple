@@ -26,6 +26,7 @@ struct FluxAppleApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .tint(Color.fluxPrimary)
         }
         .modelContainer(sharedModelContainer)
     }

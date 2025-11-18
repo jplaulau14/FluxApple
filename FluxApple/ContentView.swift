@@ -29,12 +29,12 @@ struct ContentView: View {
 
 struct TaskRowView: View {
     let task: Task
-    
+
     var body: some View {
         HStack {
             Image(systemName: task.isCompleted ? "checkmark.circle.fill": "circle")
-                .foregroundStyle(task.isCompleted ? .green: .gray)
-            
+                .foregroundStyle(task.isCompleted ? Color.fluxSuccess : Color.fluxPrimary)
+
             Text(task.title)
                 .strikethrough(task.isCompleted)
                 .foregroundStyle(task.isCompleted ? .secondary: .primary)
