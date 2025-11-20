@@ -6,47 +6,76 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct ContentView: View {
-    @State private var viewModel = TaskListViewModel()
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: \Task.sortOrder) private var tasks: [Task]
+    @State private var isShowingAddTask = false
 
     var body: some View {
         NavigationStack {
-            TaskListContent(viewModel: viewModel)
-                .navigationTitle("Flux")
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        AddTaskButton(viewModel: viewModel)
-                    }
+            TaskListContent(
+                tasks: tasks,
+                onToggleTask: toggleTask,
+                onDeleteTasks: deleteTasks
+            )
+            .navigationTitle("Flux")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    AddTaskButton(onTap: { isShowingAddTask = true })
                 }
-                .sheet(isPresented: $viewModel.isShowingAddTask) {
-                    AddTaskView(viewModel: viewModel)
-                }
+            }
+            .sheet(isPresented: $isShowingAddTask) {
+                AddTaskView(
+                    onAddTask: addTask,
+                    onDismiss: { isShowingAddTask = false }
+                )
+            }
+        }
+    }
+
+    private func addTask(title: String) {
+        let taskService = TaskService(modelContext: modelContext)
+        _ = try? taskService.createTask(title: title)
+    }
+
+    private func toggleTask(_ task: Task) {
+        let taskService = TaskService(modelContext: modelContext)
+        _ = try? taskService.toggleTaskCompletion(task)
+    }
+
+    private func deleteTasks(at offsets: IndexSet) {
+        let taskService = TaskService(modelContext: modelContext)
+        for index in offsets {
+            _ = try? taskService.deleteTask(tasks[index])
         }
     }
 }
 
 private struct TaskListContent: View {
-    let viewModel: TaskListViewModel
+    let tasks: [Task]
+    let onToggleTask: (Task) -> Void
+    let onDeleteTasks: (IndexSet) -> Void
 
     var body: some View {
         List {
-            ForEach(viewModel.tasks) { task in
+            ForEach(tasks) { task in
                 TaskRowView(
                     task: task,
-                    onToggle: { viewModel.toggleTask(id: task.id) }
+                    onToggle: { onToggleTask(task) }
                 )
             }
-            .onDelete(perform: viewModel.deleteTasks)
+            .onDelete(perform: onDeleteTasks)
         }
     }
 }
 
 private struct AddTaskButton: View {
-    let viewModel: TaskListViewModel
+    let onTap: () -> Void
 
     var body: some View {
-        Button(action: viewModel.showAddTask) {
+        Button(action: onTap) {
             Image(systemName: "plus")
         }
     }
@@ -63,10 +92,25 @@ struct TaskRowView: View {
                 onToggle: onToggle
             )
 
-            TaskTitleText(
-                title: task.title,
-                isCompleted: task.isCompleted
-            )
+            VStack(alignment: .leading, spacing: 4) {
+                TaskTitleText(
+                    title: task.title,
+                    isCompleted: task.isCompleted
+                )
+
+                if task.priority != .p4 || task.status != .inbox {
+                    TaskMetadata(
+                        priority: task.priority,
+                        status: task.status
+                    )
+                }
+            }
+
+            Spacer()
+
+            if task.priority != .p4 {
+                PriorityIndicator(priority: task.priority)
+            }
         }
     }
 }
@@ -96,9 +140,9 @@ private struct TaskTitleText: View {
 }
 
 struct AddTaskView: View {
-    let viewModel: TaskListViewModel
+    let onAddTask: (String) -> Void
+    let onDismiss: () -> Void
     @State private var taskTitle = ""
-    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         NavigationStack {
@@ -109,14 +153,14 @@ struct AddTaskView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    CancelButton(dismiss: dismiss)
+                    CancelButton(onCancel: onDismiss)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     AddButton(
                         taskTitle: taskTitle,
                         onAdd: {
-                            viewModel.addTask(title: taskTitle)
-                            viewModel.dismissAddTask()
+                            onAddTask(taskTitle)
+                            onDismiss()
                         }
                     )
                 }
@@ -134,12 +178,12 @@ private struct TaskTitleField: View {
     }
 }
 
-private struct CancelButton: View{
-    let dismiss: DismissAction
+private struct CancelButton: View {
+    let onCancel: () -> Void
 
     var body: some View {
         Button("Cancel") {
-            dismiss()
+            onCancel()
         }
     }
 }
@@ -153,6 +197,37 @@ private struct AddButton: View {
             onAdd()
         }
         .disabled(taskTitle.trimmingCharacters(in: .whitespaces).isEmpty)
+    }
+}
+
+private struct TaskMetadata: View {
+    let priority: Priority
+    let status: TaskStatus
+
+    var body: some View {
+        HStack(spacing: 8) {
+            if priority != .p4 {
+                Text(priority.displayName)
+                    .font(.caption)
+                    .foregroundStyle(priority.color)
+            }
+
+            if status != .inbox {
+                Text(status.displayName)
+                    .font(.caption)
+                    .foregroundStyle(status.color)
+            }
+        }
+    }
+}
+
+private struct PriorityIndicator: View {
+    let priority: Priority
+
+    var body: some View {
+        Circle()
+            .fill(priority.color)
+            .frame(width: 8, height: 8)
     }
 }
 
