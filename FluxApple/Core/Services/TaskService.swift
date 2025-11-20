@@ -44,9 +44,37 @@ final class TaskService {
         return try modelContext.fetch(descriptor).first
     }
 
+    func fetchActiveTasks() throws -> [Task] {
+        let allTasks = try fetchAllTasks()
+        return allTasks.filter { task in
+            task.status != .completed && task.status != .archived
+        }
+    }
+
+    func fetchCompletedTasks() throws -> [Task] {
+        let allTasks = try fetchAllTasks()
+        return allTasks.filter { $0.status == .completed }
+            .sorted { first, second in
+                guard let firstDate = first.completedAt,
+                      let secondDate = second.completedAt else {
+                    return false
+                }
+                return firstDate > secondDate
+            }
+    }
+
     // MARK: - Update
 
     func updateTask(_ task: Task) throws {
+        try modelContext.save()
+    }
+
+    func updateTaskTitle(_ task: Task, newTitle: String) throws {
+        guard !newTitle.trimmingCharacters(in: .whitespaces).isEmpty else {
+            throw TaskServiceError.emptyTitle
+        }
+
+        task.title = newTitle.trimmingCharacters(in: .whitespaces)
         try modelContext.save()
     }
 

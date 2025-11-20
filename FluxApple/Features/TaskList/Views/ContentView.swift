@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Task.sortOrder) private var tasks: [Task]
     @State private var isShowingAddTask = false
+    @State private var showTaskCreatedFeedback = false
 
     var body: some View {
         NavigationStack {
@@ -32,12 +33,33 @@ struct ContentView: View {
                     onDismiss: { isShowingAddTask = false }
                 )
             }
+            .overlay(alignment: .bottom) {
+                if showTaskCreatedFeedback {
+                    TaskCreatedBanner()
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .overlay {
+                Button("", action: { isShowingAddTask = true })
+                    .keyboardShortcut("n", modifiers: .command)
+                    .hidden()
+            }
         }
     }
 
     private func addTask(title: String) {
         let taskService = TaskService(modelContext: modelContext)
         _ = try? taskService.createTask(title: title)
+
+        withAnimation {
+            showTaskCreatedFeedback = true
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation {
+                showTaskCreatedFeedback = false
+            }
+        }
     }
 
     private func toggleTask(_ task: Task) {
@@ -57,16 +79,24 @@ private struct TaskListContent: View {
     let tasks: [Task]
     let onToggleTask: (Task) -> Void
     let onDeleteTasks: (IndexSet) -> Void
+    @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        List {
-            ForEach(tasks) { task in
-                TaskRowView(
-                    task: task,
-                    onToggle: { onToggleTask(task) }
-                )
+        Group {
+            if tasks.isEmpty {
+                EmptyStateView()
+            } else {
+                List {
+                    ForEach(tasks) { task in
+                        TaskRowView(
+                            task: task,
+                            onToggle: { onToggleTask(task) },
+                            modelContext: modelContext
+                        )
+                    }
+                    .onDelete(perform: onDeleteTasks)
+                }
             }
-            .onDelete(perform: onDeleteTasks)
         }
     }
 }
@@ -84,6 +114,10 @@ private struct AddTaskButton: View {
 struct TaskRowView: View {
     let task: Task
     let onToggle: () -> Void
+    let modelContext: ModelContext
+
+    @State private var isEditing = false
+    @State private var editedTitle = ""
 
     var body: some View {
         HStack(spacing: 12) {
@@ -92,17 +126,25 @@ struct TaskRowView: View {
                 onToggle: onToggle
             )
 
-            VStack(alignment: .leading, spacing: 4) {
-                TaskTitleText(
-                    title: task.title,
-                    isCompleted: task.isCompleted
+            if isEditing {
+                TaskTitleEditField(
+                    title: $editedTitle,
+                    onCommit: saveEdit,
+                    onCancel: cancelEdit
                 )
-
-                if task.priority != .p4 || task.status != .inbox {
-                    TaskMetadata(
-                        priority: task.priority,
-                        status: task.status
+            } else {
+                VStack(alignment: .leading, spacing: 4) {
+                    TaskTitleText(
+                        title: task.title,
+                        isCompleted: task.isCompleted
                     )
+
+                    if task.priority != .p4 || task.status != .inbox {
+                        TaskMetadata(
+                            priority: task.priority,
+                            status: task.status
+                        )
+                    }
                 }
             }
 
@@ -112,6 +154,39 @@ struct TaskRowView: View {
                 PriorityIndicator(priority: task.priority)
             }
         }
+        .contextMenu {
+            Button {
+                startEditing()
+            } label: {
+                Label("Edit", systemImage: "pencil")
+            }
+
+            Button(role: .destructive) {
+                deleteTask()
+            } label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+    }
+
+    private func startEditing() {
+        editedTitle = task.title
+        isEditing = true
+    }
+
+    private func saveEdit() {
+        let taskService = TaskService(modelContext: modelContext)
+        _ = try? taskService.updateTaskTitle(task, newTitle: editedTitle)
+        isEditing = false
+    }
+
+    private func cancelEdit() {
+        isEditing = false
+    }
+
+    private func deleteTask() {
+        let taskService = TaskService(modelContext: modelContext)
+        _ = try? taskService.deleteTask(task)
     }
 }
 
@@ -228,6 +303,53 @@ private struct PriorityIndicator: View {
         Circle()
             .fill(priority.color)
             .frame(width: 8, height: 8)
+    }
+}
+
+private struct TaskTitleEditField: View {
+    @Binding var title: String
+    let onCommit: () -> Void
+    let onCancel: () -> Void
+    @FocusState private var isFocused: Bool
+
+    var body: some View {
+        TextField("Task title", text: $title)
+            .focused($isFocused)
+            .onAppear {
+                isFocused = true
+            }
+            .onSubmit {
+                onCommit()
+            }
+            .submitLabel(.done)
+    }
+}
+
+private struct EmptyStateView: View {
+    var body: some View {
+        ContentUnavailableView {
+            Label("No Tasks", systemImage: "checklist")
+        } description: {
+            Text("Tap the + button to create your first task")
+        }
+    }
+}
+
+private struct TaskCreatedBanner: View {
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(.white)
+            Text("Task created")
+                .foregroundStyle(.white)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background {
+            Capsule()
+                .fill(Color.fluxSuccess)
+        }
+        .padding(.bottom, 20)
     }
 }
 
