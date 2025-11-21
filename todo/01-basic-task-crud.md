@@ -12,61 +12,61 @@ Implement complete Create, Read, Update, Delete operations for tasks. This inclu
 ## Client-Side To-Do Items
 
 ### Task Creation UI
-- [ ] Create `TaskInputView` component with text field for task title
-- [ ] Add "Add Task" button or submit action (Enter key support)
-- [ ] Implement quick-add input bar (minimal UI, always accessible)
-- [ ] Show visual feedback when task is created (animation, success state)
-- [ ] Clear input field after successful task creation
-- [ ] Add keyboard shortcuts for quick task creation (Cmd+N on macOS)
+- [x] Create `TaskInputView` component with text field for task title
+- [x] Add "Add Task" button or submit action (Enter key support)
+- [x] Implement quick-add input bar (minimal UI, always accessible)
+- [x] Show visual feedback when task is created (animation, success state)
+- [x] Clear input field after successful task creation
+- [x] Add keyboard shortcuts for quick task creation (Cmd+N on macOS)
 
 ### Task List Display
-- [ ] Implement `TaskListView` to display all tasks
-- [ ] Create `TaskRowView` with:
+- [x] Implement `TaskListView` to display all tasks
+- [x] Create `TaskRowView` with:
   - Checkbox for completion toggle
   - Task title display
   - Context menu for actions (edit, delete)
-- [ ] Add visual distinction for completed vs active tasks
-- [ ] Implement list item selection state
+- [x] Add visual distinction for completed vs active tasks
+- [x] Implement list item selection state
 
 ### Task Editing UI
-- [ ] Create inline editing mode for task title (double-click or tap to edit)
-- [ ] Add "Edit" action in context menu
-- [ ] Show/hide edit controls appropriately
-- [ ] Implement edit confirmation (auto-save on blur/submit)
+- [x] Create inline editing mode for task title (double-click or tap to edit)
+- [x] Add "Edit" action in context menu
+- [x] Show/hide edit controls appropriately
+- [x] Implement edit confirmation (auto-save on blur/submit)
 - [ ] Add edit cancellation (Escape key)
 
 ### Task Completion UI
-- [ ] Implement checkbox toggle animation
-- [ ] Add strikethrough effect for completed tasks
+- [x] Implement checkbox toggle animation
+- [x] Add strikethrough effect for completed tasks
 - [ ] Show completion timestamp on hover/long-press
-- [ ] Implement visual transition when task is marked complete
+- [x] Implement visual transition when task is marked complete
 
 ### Task Deletion UI
-- [ ] Add "Delete" action in context menu
-- [ ] Implement swipe-to-delete gesture (iOS pattern)
+- [x] Add "Delete" action in context menu
+- [x] Implement swipe-to-delete gesture (iOS pattern)
 - [ ] Show confirmation dialog for destructive delete action
 - [ ] Display undo notification/toast after deletion
 - [ ] Implement undo button in notification
 
 ### Empty States
-- [ ] Design empty state for task list
-- [ ] Add helpful message for first-time users
-- [ ] Include visual hints for how to create first task
+- [x] Design empty state for task list
+- [x] Add helpful message for first-time users
+- [x] Include visual hints for how to create first task
 
 ---
 
 ## Logic-Side To-Do Items
 
 ### Task Service / Repository
-- [ ] Implement `createTask(title:)` method
+- [x] Implement `createTask(title:)` method
 - [ ] Implement `createTask(title:dueDate:priority:)` with additional parameters
-- [ ] Implement `fetchAllTasks()` method
-- [ ] Implement `fetchActiveTasks()` method (filter by status)
-- [ ] Implement `fetchCompletedTasks()` method
-- [ ] Implement `updateTask(_:)` method
-- [ ] Implement `updateTaskTitle(_:newTitle:)` method
-- [ ] Implement `toggleTaskCompletion(_:)` method
-- [ ] Implement `deleteTask(_:)` method
+- [x] Implement `fetchAllTasks()` method
+- [x] Implement `fetchActiveTasks()` method (filter by status)
+- [x] Implement `fetchCompletedTasks()` method
+- [x] Implement `updateTask(_:)` method
+- [x] Implement `updateTaskTitle(_:newTitle:)` method
+- [x] Implement `toggleTaskCompletion(_:)` method
+- [x] Implement `deleteTask(_:)` method
 - [ ] Implement `softDeleteTask(_:)` method (change status to archived)
 
 ### Undo/Redo System
@@ -80,25 +80,25 @@ Implement complete Create, Read, Update, Delete operations for tasks. This inclu
 - [ ] Set undo timeout (e.g., 5 seconds)
 
 ### State Management
-- [ ] Create `TaskListViewModel` or equivalent state container
-- [ ] Implement `@Published` properties for task list
+- [x] Create `TaskListViewModel` or equivalent state container (using SwiftData @Query directly)
+- [x] Implement `@Published` properties for task list (using @Query)
 - [ ] Add loading state management
 - [ ] Add error state management
 - [ ] Implement optimistic updates for better UX
 - [ ] Add error recovery mechanisms
 
 ### Data Validation
-- [ ] Validate task title is not empty
+- [x] Validate task title is not empty
 - [ ] Validate task title length (max characters)
-- [ ] Trim whitespace from task title
+- [x] Trim whitespace from task title
 - [ ] Prevent duplicate tasks (optional, based on requirements)
 
 ### Business Logic
-- [ ] Set default values for new tasks (status = inbox, priority = p4)
-- [ ] Auto-set `createdAt` timestamp
-- [ ] Set `completedAt` timestamp when task is marked complete
-- [ ] Clear `completedAt` when task is unmarked as complete
-- [ ] Update `sortOrder` for new tasks (append to end)
+- [x] Set default values for new tasks (status = inbox, priority = p4)
+- [x] Auto-set `createdAt` timestamp
+- [x] Set `completedAt` timestamp when task is marked complete
+- [x] Clear `completedAt` when task is unmarked as complete
+- [x] Update `sortOrder` for new tasks (append to end)
 
 ---
 

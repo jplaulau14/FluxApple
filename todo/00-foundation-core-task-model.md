@@ -12,24 +12,24 @@ Establish the foundational data model for tasks using SwiftData. This includes a
 ## Client-Side To-Do Items
 
 ### UI Components
-- [ ] Create basic `TaskRowView` component to display task properties
-- [ ] Design and implement task property display layout (title, dates, priority indicator)
-- [ ] Create visual indicators for task status (inbox, active, completed, archived)
-- [ ] Implement basic list view to display multiple tasks
-- [ ] Add placeholder UI for empty task lists
+- [x] Create basic `TaskRowView` component to display task properties
+- [x] Design and implement task property display layout (title, dates, priority indicator)
+- [x] Create visual indicators for task status (inbox, active, completed, archived)
+- [x] Implement basic list view to display multiple tasks
+- [x] Add placeholder UI for empty task lists
 
 ### Visual Design
-- [ ] Define color scheme for priority levels (P1-P4)
-- [ ] Design status badges (inbox, active, completed, archived)
+- [x] Define color scheme for priority levels (P1-P4)
+- [x] Design status badges (inbox, active, completed, archived)
 - [ ] Create icons for task properties (due date, priority, recurrence, etc.)
-- [ ] Establish spacing and typography for task display
+- [x] Establish spacing and typography for task display
 
 ---
 
 ## Logic-Side To-Do Items
 
 ### SwiftData Models
-- [ ] Create `Task` model with all core properties:
+- [x] Create `Task` model with all core properties:
   - `id: UUID`
   - `title: String`
   - `taskDescription: String?`
@@ -42,9 +42,9 @@ Establish the foundational data model for tasks using SwiftData. This includes a
   - `createdAt: Date`
   - `completedAt: Date?`
   - `sortOrder: Int`
-- [ ] Create `Priority` enum with cases: p1, p2, p3, p4
-- [ ] Create `TaskStatus` enum with cases: inbox, active, completed, archived
-- [ ] Implement computed properties for task states (isOverdue, isToday, etc.)
+- [x] Create `Priority` enum with cases: p1, p2, p3, p4
+- [x] Create `TaskStatus` enum with cases: inbox, active, completed, archived
+- [x] Implement computed properties for task states (isOverdue, isToday, etc.)
 
 ### Relationships (Placeholders for future blocks)
 - [ ] Add relationship property for `project` (optional, one-to-many)
@@ -54,17 +54,17 @@ Establish the foundational data model for tasks using SwiftData. This includes a
 - [ ] Add relationship property for `subtasks` (one-to-many)
 
 ### SwiftData Configuration
-- [ ] Set up `ModelContainer` in app entry point
-- [ ] Configure schema with all models
-- [ ] Set up `ModelContext` for data operations
-- [ ] Implement proper error handling for persistence operations
+- [x] Set up `ModelContainer` in app entry point
+- [x] Configure schema with all models
+- [x] Set up `ModelContext` for data operations
+- [x] Implement proper error handling for persistence operations
 
 ### Basic Data Operations
-- [ ] Create `TaskService` or repository class for data access
-- [ ] Implement `fetchAllTasks()` method
-- [ ] Implement `fetchTask(byId:)` method
-- [ ] Implement basic task creation method (for testing)
-- [ ] Implement basic task deletion method (for testing)
+- [x] Create `TaskService` or repository class for data access
+- [x] Implement `fetchAllTasks()` method
+- [x] Implement `fetchTask(byId:)` method
+- [x] Implement basic task creation method (for testing)
+- [x] Implement basic task deletion method (for testing)
 
 ---
 
